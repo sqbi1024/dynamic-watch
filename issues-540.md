@@ -32,3 +32,23 @@ type WatcherInjector interface {
 
 @DirectXMan12 如果我们修改 builder.Complete() 使其返回刚刚创建的 controller 呢？
 然后用户可以对其进行任何他们想要的操作（包括将其传递给他们的 reconciler）。
+
+---
+
+或者在 Builder 上暴露一个 GetController() 方法。
+
+---
+
++1 对于拥有获取 controller 的方法或者让 Complete() 返回创建的 controller 和错误。今天，kubebuilder 调用 ctrl.NewControllerManagedBy(...)，通常我认为它会返回一个我可以使用的新的 Controller 对象。
+
+---
+
+我更倾向于不使用 Complete（如果可以的话，只是为了避免常用函数的破坏），但我支持一个类似的方法。由于 Build 已经被废弃了几个版本，我们可以重新利用它（尽管这可能导致破坏）或者想出一个新方法。
+
+---
+
+我不认为我们想要两种不同的完成/构建方式 - 一种返回 controller，一种不返回 - 我们会这样想吗？
+
+---
+
+概括我们昨天在 Slack 上的讨论（https://kubernetes.slack.com/archives/CAR30FCJZ/p1564433195123400），我们将取消 Build 的废弃，并让它返回 Controller 而非 Manager。我们还将删除 builder 中的逻辑，该逻辑在你不传入 manager 时为你创建一个 manager。
